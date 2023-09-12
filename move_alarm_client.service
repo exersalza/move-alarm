@@ -1,0 +1,16 @@
+[Unit]
+Description=The Occasional alarm that rings to reminds you to move
+After=network.target
+
+[Service]
+Type=simple
+User=julian
+Group=audio
+SupplementaryGroups=video
+Environment="DISPLAY=:0" "PULSE_SERVER=unix:/run/user/1000/pulse/native"
+WorkingDirectory=/home/julian/development/python/schoolprojects/move-alarm/src/
+ExecStart=/usr/bin/python3 /home/julian/development/python/schoolprojects/move-alarm/src/client_alarm.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
