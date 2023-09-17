@@ -1,12 +1,12 @@
 import os
 import sys
 import time
+import random
 import threading
 import subprocess
 import configparser
-import random
 
-SLEEPY_TIME = 10  # get an hour of silence
+SLEEPY_TIME = 10  # get an hour of silence, not anymore, but normally
 
 threads = []
 
