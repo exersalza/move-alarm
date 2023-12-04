@@ -1,0 +1,3 @@
+[submodule "kebab-box-config"]
+    path = kebab-box-config
+    url = "https://github.com/zerxgit/kebab-box-config"
