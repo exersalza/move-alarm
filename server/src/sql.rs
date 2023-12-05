@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use log;
+
 use sqlite;
 
 use std::fs;
@@ -48,14 +48,12 @@ impl Sql {
             DO UPDATE SET media_path = excluded.media_path;", data.username, data.path);
 
         self.conn.execute(query).expect("I let my threads panic for pleasure");
-
     }
 
     pub fn delete_user(&self, user: String) {
         self.conn.execute(format!("DELETE FROM user WHERE user = '{}';", user))
                 .expect("TODO: panic message");
     }
-
 }
 
 fn create_user(path: &str) -> std::io::Result<sqlite::Connection> {
