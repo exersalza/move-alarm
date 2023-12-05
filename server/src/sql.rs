@@ -3,6 +3,8 @@ use std::collections::HashMap;
 use sqlite;
 
 use std::fs;
+use sqlite::State;
+use tracing_subscriber::fmt::format;
 use crate::Config;
 
 pub struct Sql {
@@ -21,6 +23,7 @@ impl Sql {
         Self { conn }
     }
 
+    /// Get all users in an Vector with HashMaps
     pub fn get_all_users(&self) -> Vec<HashMap<String, String>> {
         let query = "select * from user";
         let mut statement = self.conn.prepare(query).unwrap();
@@ -41,6 +44,8 @@ impl Sql {
         ret
     }
 
+
+    /// Update an user
     pub fn update_user(&self, data: Config) {
         let query = format!("INSERT INTO user (user, media_path)
             VALUES ('{}', '{}')
@@ -50,12 +55,26 @@ impl Sql {
         self.conn.execute(query).expect("I let my threads panic for pleasure");
     }
 
+    /// Delete a user by its name
     pub fn delete_user(&self, user: String) {
         self.conn.execute(format!("DELETE FROM user WHERE user = '{}';", user))
                 .expect("TODO: panic message");
     }
+
+    /// Get the path for an user
+    pub fn get_path(&self, user: String) -> String {
+        let mut path: String = String::new();
+        let mut st = self.conn.prepare(format!("SELECT media_path FROM user WHERE user = '{user}'")).unwrap();
+
+        while let Ok(State::Row) = st.next() {
+            path = st.read::<String, _>("media_path").unwrap();
+        }
+
+        path
+    }
 }
 
+/// Creates the user db if its not existing
 fn create_user(path: &str) -> std::io::Result<sqlite::Connection> {
     fs::File::create(path)?;
 

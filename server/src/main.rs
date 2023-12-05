@@ -141,6 +141,6 @@ async fn delete_user(Path(user): Path<String>) -> impl IntoResponse {
     Json::from(())
 }
 
-async fn get_config(Path(_user): Path<String>) -> impl IntoResponse {
-    todo!()
+async fn get_config(Path(user): Path<String>) -> impl IntoResponse {
+   SQL.lock().expect("can't lock").get_path(user)
 }
