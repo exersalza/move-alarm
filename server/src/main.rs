@@ -6,10 +6,15 @@ use std::path::PathBuf;
 use std::str::FromStr;
 use std::sync::Mutex;
 
-use axum::response::Html;
-use axum::{http::StatusCode, Json, response::IntoResponse, routing::{get, Router}};
 use axum::extract::Path;
+use axum::response::Html;
 use axum::routing::{delete, post};
+use axum::{
+    http::StatusCode,
+    response::IntoResponse,
+    routing::{get, Router},
+    Json,
+};
 use clap::Parser;
 use lazy_static::lazy_static;
 use serde_derive::{Deserialize, Serialize};
@@ -22,7 +27,7 @@ use tower_http::trace::TraceLayer;
 
 use crate::sql::Sql;
 
-lazy_static!{
+lazy_static! {
     pub static ref SQL: Mutex<Sql> = Mutex::new(Sql::new());
 }
 
@@ -58,7 +63,6 @@ async fn main() {
     }
 
     drop(SQL.lock().expect("random"));
-
 
     let cors = CorsLayer::new()
         .allow_methods(Any) // Allow all methods
@@ -118,7 +122,6 @@ pub struct Config {
     path: String,
 }
 
-
 async fn post_config(Json(data): Json<Config>) -> impl IntoResponse {
     SQL.lock().expect("some lock not working").update_user(data);
     Json::from(HashMap::<String, String>::new())
@@ -126,7 +129,6 @@ async fn post_config(Json(data): Json<Config>) -> impl IntoResponse {
 
 async fn get_all_user() -> impl IntoResponse {
     let sql = SQL.lock().expect("can't lock");
-
 
     Json::from(sql.get_all_users())
 }
@@ -142,5 +144,5 @@ async fn delete_user(Path(user): Path<String>) -> impl IntoResponse {
 }
 
 async fn get_config(Path(user): Path<String>) -> impl IntoResponse {
-   SQL.lock().expect("can't lock").get_path(user)
+    SQL.lock().expect("can't lock").get_path(user)
 }
