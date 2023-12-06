@@ -5,10 +5,14 @@ import random
 import threading
 import subprocess
 import configparser
+import requests
+import platform
 
 SLEEPY_TIME = 10  # get an hour of silence, not anymore, but normally
+IP = "192.168.231.179"
 
 threads = []
+
 
 # 16.4 -> 19.9
 def main_thread(media) -> int:
@@ -20,23 +24,34 @@ def main_thread(media) -> int:
         # do what ever you want to do
 
         rand_int = random.randint(0, len(media) - 1)
-        subprocess.run(f"mplayer -ao alsa {media[rand_int]}".split()) 
+        subprocess.run(f"mplayer -ao alsa {media[rand_int]}".split())
 
     return 0
 
 
 def main() -> int:
     media = []
+    path = f'{os.environ["HOME"]}/.config/move-alarm/config.cfg'
+    windows_path = path.replace('/', '\\')
 
-    cfg = configparser.ConfigParser()
-    cfg.read(f'{os.environ["HOME"]}/.config/move-alarm/config.cfg')
-    
-    media_path = cfg.get("media_location", "path")
+    if platform.platform == 'windows':
+        path = windows_path
 
-    for i in os.walk(f'{media_path}'.format(HOME=os.environ["HOME"])):
+
+    url = f'https://{IP}:6969/api/web/config/Olaf'
+    if os.path.isfile(path):
+        cfg = configparser.ConfigParser()
+        cfg.read(path)
+        path = cfg.get("media_location", "path")
+    else:
+        response = requests.get(url)
+        if response.status_code == 200:
+            path = response.content
+
+    for i in os.walk(f'{path}'.format(HOME=os.environ["HOME"])):
         if not i[2]:
             continue
-        
+
         media.extend(i[0] + j for j in i[2])
 
     _main_thread = threading.Thread(target=main_thread, args=(media,))
